@@ -7,7 +7,7 @@ namespace PowerChat.App.Services
     public class ChatService
     {
         private readonly HubConnection _hubConnection;
-        private const string ServerUrl = "https://powerchat-server.onrender.com/chat";
+        private const string ServerUrl = "https://powerproject.onrender.com/chat";
 
         public event Action<string, string> OnMessageReceived = delegate { };
         private readonly Channel<ChatMessage> _messageQueue = Channel.CreateUnbounded<ChatMessage>();

@@ -11,8 +11,20 @@ builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 // This enables real-time communication capabilities for the chat application.
 builder.Services.AddSignalR();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
 // Finalizes service configuration and builds the application instance.
 var app = builder.Build();
+
+app.UseCors();
 
 // Enforces HTTPS redirection for all incoming requests.
 // This ensures that insecure connections are automatically upgraded to secure ones.
