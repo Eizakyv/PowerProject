@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:PowerChat.App.Models"
+             xmlns:local="clr-namespace:PowerChat.App"
+             x:Class="PowerChat.App.MainPage"
+             x:DataType="local:MainPage"
+             BackgroundColor="Cornsilk">
+
+    <Grid RowDefinitions="Auto, *, Auto, Auto"
+          Padding="20"
+          RowSpacing="20">
+
+        <Border Grid.Row="0"
+                BackgroundColor="Wheat"
+                Stroke="Black"
+                StrokeThickness="1"
+                WidthRequest="250"
+                HorizontalOptions="Center">
+            <Border.StrokeShape>
+                <Rectangle/>
+            </Border.StrokeShape>
+
+            <Label Text="PowerChat" 
+                   FontSize="32" 
+                   FontAttributes="Bold"
+                   TextColor="#556B2F"
+                   HorizontalOptions="Center" 
+                   Margin="20"/>
+        </Border>
+
+        <Border Grid.Row="1"
+                BackgroundColor="Wheat"
+                Stroke="Black"
+                StrokeThickness="1"
+                Padding="20">
+            <Border.StrokeShape>
+                <Rectangle/>
+            </Border.StrokeShape>
+
+            <CollectionView x:Name="MessagesListView"
+                            ItemsSource="{Binding Messages}"
+                            SelectionMode="None"
+                            ItemsLayout="VerticalList"
+                            VerticalScrollBarVisibility="Never">
+                
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ChatMessage">
+                        <ContentView Padding="0,0,0,10">
+                            <Border BackgroundColor="White"
+                                    Stroke="Black"
+                                    StrokeThickness="1"
+                                    Padding="12,10">
+                                
+                                <Border.StrokeShape>
+                                    <Rectangle/>
+                                </Border.StrokeShape>
+
+                                <VerticalStackLayout Spacing="0">
+                                    <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,5">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding User}"
+                                               FontSize="12" 
+                                               FontAttributes="Bold" 
+                                               TextColor="#556B2F"
+                                               HorizontalOptions="Start"/>
+
+                                        <Label Grid.Column="1"
+                                               Text="{Binding Status}"
+                                               FontFamily="FASolid"
+                                               FontSize="10" 
+                                               TextColor="Gray"
+                                               HorizontalOptions="End"
+                                               VerticalOptions="Center"/>
+                                    </Grid>
+
+                                    <Label Text="{Binding Text}"
+                                       FontSize="14" 
+                                       TextColor="#4B3621"/>
+                                    <Label Text="{Binding FormattedTime}" 
+                                       FontSize="10" 
+                                       TextColor="Gray"
+                                       HorizontalOptions="End"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </ContentView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Border>
+
+        <Border Grid.Row="2"
+                BackgroundColor="Wheat"
+                Stroke="Black" 
+                StrokeThickness="1" 
+                HeightRequest="75">
+            <Border.StrokeShape>
+                <Rectangle />
+            </Border.StrokeShape>
+
+            <Border BackgroundColor="White"
+                    Stroke="Black" 
+                    StrokeThickness="1" 
+                    Margin="20,0"
+                    HeightRequest="50">
+                <Border.StrokeShape>
+                    <Rectangle />
+                </Border.StrokeShape>
+
+                <Entry x:Name="MessageEntry"
+                       Placeholder=""
+                       FontSize="14"
+                       TextColor="#4B3621"
+                       BackgroundColor="Transparent"
+                       HorizontalOptions="Fill"
+                       Margin="0,0"
+                       Keyboard="Chat"
+                       Completed="OnSendClicked"/>
+            </Border>
+        </Border>
+
+        <Border Grid.Row="3"
+                BackgroundColor="Wheat"
+                Stroke="Black" 
+                StrokeThickness="1" 
+                HeightRequest="50"
+                WidthRequest="120"
+                HorizontalOptions="Center">
+            <Border.StrokeShape>
+                <Rectangle />
+            </Border.StrokeShape>
+
+            <Button Text="Send"
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    TextColor="#556B2F"
+                    BackgroundColor="Transparent" 
+                    CornerRadius="0"
+                    Padding="0"
+                    Clicked="OnSendClicked"/>
+        </Border>
+    </Grid>
+</ContentPage>

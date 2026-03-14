@@ -1,0 +1,5 @@
+@Hostname = 192.168.50.129
+@Port = 5257
+
+GET http://{{Hostname}}:{{Port}}/weatherforecast/
+Accept: application/json
