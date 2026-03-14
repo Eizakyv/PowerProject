@@ -43,12 +43,16 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-		<AssemblyName>$PowerChat</AssemblyName>
+		<AssemblyName>PowerChat</AssemblyName>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-android|AnyCPU'">
 	  <ApplicationTitle>PowerChat</ApplicationTitle>
 	  <ApplicationId>com.meyzov.powerchat.app</ApplicationId>
+	  <AndroidEnableMultiDex>False</AndroidEnableMultiDex>
+	  <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+	  <EnableLLVM>True</EnableLLVM>
+	  <AndroidKeyStore>False</AndroidKeyStore>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-windows10.0.19041.0|AnyCPU'">
@@ -59,23 +63,34 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-android|AnyCPU'">
 	  <ApplicationTitle>PowerChat</ApplicationTitle>
 	  <ApplicationId>com.meyzov.powerchat.app</ApplicationId>
+	  <AndroidPackageFormat>aab</AndroidPackageFormat>
+	  <PublishTrimmed>True</PublishTrimmed>
+	  <AndroidUseAapt2>True</AndroidUseAapt2>
+	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+	  <Optimize>False</Optimize>
+	  <RunAOTCompilation>True</RunAOTCompilation>
+	  <AndroidEnableMultiDex>False</AndroidEnableMultiDex>
+	  <EnableLLVM>True</EnableLLVM>
+	  <AndroidKeyStore>False</AndroidKeyStore>
+	  <AndroidEnableProfiledAot>True</AndroidEnableProfiledAot>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-windows10.0.19041.0|AnyCPU'">
 	  <ApplicationTitle>PowerChat</ApplicationTitle>
 	  <ApplicationId>com.meyzov.powerchat.app</ApplicationId>
+	  <Optimize>False</Optimize>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appiconfg.svg">
-		  <Color>#512BD4</Color>
+		  <Color>#000000</Color>
 		  <ForegroundFile>Resources\AppIcon\appiconfg.svg</ForegroundFile>
 		</MauiIcon>
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#000000" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#000000" BaseSize="128,128" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
@@ -92,6 +107,12 @@
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.4" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiFont Update="Resources\Fonts\Font Awesome 7 Free-Solid-900.otf">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiFont>
 	</ItemGroup>
 
 </Project>

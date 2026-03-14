@@ -1,4 +1,6 @@
 <Solution>
-  <Project Path="PowerChat.App/PowerChat.App.csproj" />
+  <Project Path="PowerChat.App/PowerChat.App.csproj">
+    <Deploy />
+  </Project>
   <Project Path="PowerChat.Server/PowerChat.Server.csproj" />
 </Solution>
