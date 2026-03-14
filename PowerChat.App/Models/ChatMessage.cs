@@ -3,12 +3,37 @@ using System.Runtime.CompilerServices;
 
 namespace PowerChat.App.Models
 {
-    public class ChatMessage : INotifyPropertyChanged
+    public partial class ChatMessage : INotifyPropertyChanged
     {
-        public string User { get; set; } = string.Empty;
-        public string Text { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; }
+        public string User
+        {
+            get;
+            set;
+        }
+        = string.Empty;
+
+        private string _text = string.Empty;
+        public string Text
+        {
+            get => _text;
+            set
+            {
+                if (_text != value)
+                {
+                    _text = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public DateTime Timestamp
+        {
+            get;
+            set;
+        }
+
         public string FormattedTime => Timestamp.ToString("HH:mm");
+
 
         private string _status = string.Empty;
         public string Status
@@ -19,7 +44,7 @@ namespace PowerChat.App.Models
                 if (_status != value)
                 {
                     _status = value;
-                    OnPropertyChanged(); // Notifies UI that 'Status' has changed
+                    OnPropertyChanged();
                 }
             }
         }

@@ -23,6 +23,8 @@ namespace PowerChat.App.Services
             {
                 OnMessageReceived.Invoke(user, payload);
             });
+
+            _ = Task.Run(() => ProcessQueueAsync(CancellationToken.None));
         }
 
         public async Task Connect()
@@ -40,17 +42,22 @@ namespace PowerChat.App.Services
             }
         }
 
+        public string GetConnectionStatus()
+        {
+            return _hubConnection.State.ToString() ?? "Unknown";
+        }
+
         public async Task<bool> SendPayload(string user, string payload)
         {
+            if (_hubConnection.State != HubConnectionState.Connected)
+            {
+                return false;
+            }
+
             try
             {
-                if (_hubConnection.State == HubConnectionState.Connected)
-                {
-                    await _hubConnection.InvokeAsync("SendPayload", user, payload);
-                    return true;
-                }
-
-                return false;
+                await _hubConnection.InvokeAsync("SendPayload", user, payload);
+                return true;
             }
             catch (Exception ex)
             {
@@ -58,8 +65,6 @@ namespace PowerChat.App.Services
                 return false;
             }
         }
-
-        public string GetConnectionStatus() => _hubConnection.State.ToString() ?? "Unknown";
 
         public void EnqueueMessage(ChatMessage message)
         {

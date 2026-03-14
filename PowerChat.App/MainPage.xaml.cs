@@ -16,34 +16,38 @@ namespace PowerChat.App
         public MainPage(ChatService chatService)
         {
             InitializeComponent();
-
-            MessagesListView.ItemsSource = Messages;
             _chatService = chatService;
 
-            ConnectToServer();
+            MessagesListView.ItemsSource = Messages;
+            Loaded += OnPageLoaded;
         }
 
-        private void ChatService_OnMessageReceived(string user, string message)
+        private void OnPageLoaded(object? sender, EventArgs e)
         {
             var newMessage = new ChatMessage
             {
-                User = user,
-                Text = message,
+                User = "Log",
+                Text = "Conection status: " + _chatService.GetConnectionStatus(),
                 Timestamp = DateTime.Now,
-                Status = "\uf00c"
+                Status = "\uf017"
             };
+            Messages.Add(newMessage);
+            MessagesListView.ScrollTo(newMessage, ScrollToPosition.End, animate: false);
 
-            MainThread.BeginInvokeOnMainThread(() =>
+            Task.Run(async () =>
             {
-                Messages.Add(newMessage);
-                MessagesListView.ScrollTo(newMessage, ScrollToPosition.End, animate: false);
+                await _chatService.Connect();
+                Dispatcher.Dispatch(() =>
+                {
+                    newMessage.Text = "Conection status: " + _chatService.GetConnectionStatus();
+                    newMessage.Status = "\uf00c";
+                });
             });
         }
 
         protected override void OnAppearing()
         {
             base.OnAppearing();
-
             _chatService.OnMessageReceived -= ChatService_OnMessageReceived;
             _chatService.OnMessageReceived += ChatService_OnMessageReceived;
         }
@@ -54,24 +58,21 @@ namespace PowerChat.App
             _chatService.OnMessageReceived -= ChatService_OnMessageReceived;
         }
 
-        private async void ConnectToServer()
+        private void ChatService_OnMessageReceived(string user, string payload)
         {
-            _ = Task.Run(async () =>
+            var newMessage = new ChatMessage
             {
-                try
-                {
-                    await _chatService.Connect();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Connect Error: {ex.Message}");
-                }
-            });
+                User = user,
+                Text = payload,
+                Timestamp = DateTime.Now,
+                Status = "\uf00c"
+            };
 
-            _ = Task.Run
-            (
-                () => _chatService.ProcessQueueAsync(CancellationToken.None)
-            );
+            Dispatcher.Dispatch(() =>
+            {
+                Messages.Add(newMessage);
+                MessagesListView.ScrollTo(newMessage, ScrollToPosition.End, animate: false);
+            });
         }
 
         private async void OnSendClicked(object sender, EventArgs e)
@@ -83,7 +84,6 @@ namespace PowerChat.App
 
             string payload = MessageEntry.Text;
             MessageEntry.Text = string.Empty;
-            MessageEntry.Focus();
 
             var newMessage = new ChatMessage
             {
