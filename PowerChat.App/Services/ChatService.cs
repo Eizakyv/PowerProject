@@ -6,22 +6,31 @@ namespace PowerChat.App.Services
 {
     public class ChatService
     {
+        private readonly DatabaseService _database;
         private readonly HubConnection _hubConnection;
         private const string ServerUrl = "https://powerproject.onrender.com/chat";
 
-        public event Action<string, string> OnMessageReceived = delegate { };
+        public event Action<ChatMessage> OnMessageReceived = delegate { };
         private readonly Channel<ChatMessage> _messageQueue = Channel.CreateUnbounded<ChatMessage>();
 
-        public ChatService()
+        public ChatService(DatabaseService database)
         {
+            _database = database;
+
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(ServerUrl)
                 .WithAutomaticReconnect()
                 .Build();
 
-            _hubConnection.On<string, string>("ReceiveMessage", (user, payload) =>
+            _hubConnection.On<ChatMessage>("ReceiveMessage", async (message) =>
             {
-                OnMessageReceived.Invoke(user, payload);
+                bool inserted = await _database.SaveMessageAsync(message);
+                if (!inserted)
+                {
+                    return;
+                }
+
+                OnMessageReceived.Invoke(message);
             });
 
             _ = Task.Run(() => ProcessQueueAsync(CancellationToken.None));
@@ -47,7 +56,7 @@ namespace PowerChat.App.Services
             return _hubConnection.State.ToString() ?? "Unknown";
         }
 
-        public async Task<bool> SendPayload(string user, string payload)
+        public async Task<bool> SendPayload(ChatMessage message)
         {
             if (_hubConnection.State != HubConnectionState.Connected)
             {
@@ -56,7 +65,7 @@ namespace PowerChat.App.Services
 
             try
             {
-                await _hubConnection.InvokeAsync("SendPayload", user, payload);
+                await _hubConnection.InvokeAsync("SendPayload", message);
                 return true;
             }
             catch (Exception ex)
@@ -66,8 +75,9 @@ namespace PowerChat.App.Services
             }
         }
 
-        public void EnqueueMessage(ChatMessage message)
+        public async Task EnqueueMessage(ChatMessage message)
         {
+            await _database.SaveMessageAsync(message);
             _messageQueue.Writer.TryWrite(message);
         }
 
@@ -80,7 +90,7 @@ namespace PowerChat.App.Services
 
                 while (!sent && (DateTime.Now - startTime).TotalSeconds < 60)
                 {
-                    sent = await SendPayload(message.User, message.Text);
+                    sent = await SendPayload(message);
 
                     if (sent)
                     {
@@ -89,11 +99,12 @@ namespace PowerChat.App.Services
                     await Task.Delay(2500, ct);
                 }
 
-                MainThread.BeginInvokeOnMainThread(() =>
+                await MainThread.InvokeOnMainThreadAsync(() =>
                 {
                     message.Status = sent ? "\uf00c" : "\uf00d";
                 });
 
+                await _database.UpdateMessageAsync(message);
                 await Task.Delay(250, ct);
             }
         }

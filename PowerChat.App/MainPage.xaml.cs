@@ -6,6 +6,7 @@ namespace PowerChat.App
 {
     public partial class MainPage : ContentPage
     {
+        private readonly DatabaseService _database;
         private readonly ChatService _chatService;
         public ObservableCollection<ChatMessage> Messages
         {
@@ -13,17 +14,31 @@ namespace PowerChat.App
         }
         = [];
 
-        public MainPage(ChatService chatService)
+        public MainPage(DatabaseService database, ChatService chatService)
         {
             InitializeComponent();
+
+            _database = database;
             _chatService = chatService;
 
             MessagesListView.ItemsSource = Messages;
+
             Loaded += OnPageLoaded;
         }
 
-        private void OnPageLoaded(object? sender, EventArgs e)
+        private async void OnPageLoaded(object? sender, EventArgs e)
         {
+            var storedMessages = await _database.GetMessages();
+            foreach (var message in storedMessages)
+            {
+                Messages.Add(message);
+            }
+
+            if (Messages.Count > 0)
+            {
+                MessagesListView.ScrollTo(Messages.Last(), ScrollToPosition.End, animate: false);
+            }
+
             var newMessage = new ChatMessage
             {
                 User = "Log",
@@ -34,9 +49,10 @@ namespace PowerChat.App
             Messages.Add(newMessage);
             MessagesListView.ScrollTo(newMessage, ScrollToPosition.End, animate: false);
 
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 await _chatService.Connect();
+
                 Dispatcher.Dispatch(() =>
                 {
                     newMessage.Text = "Conection status: " + _chatService.GetConnectionStatus();
@@ -58,20 +74,12 @@ namespace PowerChat.App
             _chatService.OnMessageReceived -= ChatService_OnMessageReceived;
         }
 
-        private void ChatService_OnMessageReceived(string user, string payload)
+        private void ChatService_OnMessageReceived(ChatMessage message)
         {
-            var newMessage = new ChatMessage
-            {
-                User = user,
-                Text = payload,
-                Timestamp = DateTime.Now,
-                Status = "\uf00c"
-            };
-
             Dispatcher.Dispatch(() =>
             {
-                Messages.Add(newMessage);
-                MessagesListView.ScrollTo(newMessage, ScrollToPosition.End, animate: false);
+                Messages.Add(message);
+                MessagesListView.ScrollTo(message, ScrollToPosition.End, animate: false);
             });
         }
 
@@ -92,12 +100,11 @@ namespace PowerChat.App
                 Timestamp = DateTime.Now,
                 Status = "\uf017"
             };
-
             Messages.Add(newMessage);
             MessagesListView.ScrollTo(newMessage, ScrollToPosition.End, animate: false);
 
             // Enqueue the message to be sent to the server
-            _chatService.EnqueueMessage(newMessage);
+            await _chatService.EnqueueMessage(newMessage);
         }
     }
 }

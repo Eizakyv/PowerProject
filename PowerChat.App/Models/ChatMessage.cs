@@ -1,10 +1,26 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using SQLite;
 
 namespace PowerChat.App.Models
 {
     public partial class ChatMessage : INotifyPropertyChanged
     {
+        [Indexed(Unique = true)]
+        public Guid MessageId
+        {
+            get;
+            set;
+        }
+        = Guid.NewGuid();
+
+        [PrimaryKey, AutoIncrement]
+        public int Id
+        {
+            get;
+            set;
+        }
+
         public string User
         {
             get;
@@ -32,6 +48,7 @@ namespace PowerChat.App.Models
             set;
         }
 
+        [Ignore]
         public string FormattedTime => Timestamp.ToString("HH:mm");
 
 

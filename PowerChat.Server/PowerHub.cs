@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using PowerChat.Server.Models;
 
 namespace PowerChat.Server
 {
@@ -6,10 +7,10 @@ namespace PowerChat.Server
     {
         // This method is called by clients to send a message to the server,
         // which then broadcasts it to all connected clients.
-        public async Task SendPayload(string sender, string payload)
+        public async Task SendPayload(ChatMessage message)
         {
             // Triggers the "ReceiveMessage" event on all connected clients.
-            await Clients.Others.SendAsync("ReceiveMessage", sender, payload);
+            await Clients.Others.SendAsync("ReceiveMessage", message);
         }
     }
 }

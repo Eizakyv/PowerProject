@@ -17,6 +17,7 @@ namespace PowerChat.App
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+            builder.Services.AddSingleton<DatabaseService>();
             builder.Services.AddSingleton<ChatService>();
             builder.Services.AddTransient<MainPage>();
             return builder.Build();
