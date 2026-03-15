@@ -8,8 +8,8 @@ namespace PowerChat.App.Services
     {
         private readonly DatabaseService _database;
         private readonly HubConnection _hubConnection;
-        private const string ServerUrl = "https://powerproject.onrender.com/chat";
 
+        private const string ServerUrl = "https://powerproject.onrender.com/chat";
         public event Action<ChatMessage> OnMessageReceived = delegate { };
         private readonly Channel<ChatMessage> _messageQueue = Channel.CreateUnbounded<ChatMessage>();
 
@@ -78,35 +78,55 @@ namespace PowerChat.App.Services
 
         public async Task EnqueueMessage(ChatMessage message)
         {
-            await _database.SaveMessageAsync(message);
+            bool isSaved = await _database.SaveMessageAsync(message); // Save the message to the database first
+            if (!isSaved)
+            {
+                message.Status = "\uf00d";
+                return; // If saving fails, do not enqueue the message
+            }
+
             _messageQueue.Writer.TryWrite(message);
         }
 
-        public async Task ProcessQueueAsync(CancellationToken ct)
+        public async Task ProcessQueueAsync(CancellationToken ct) // Revision for this code.
         {
-            await foreach (var message in _messageQueue.Reader.ReadAllAsync(ct))
+            try
             {
-                bool sent = false;
-                DateTime startTime = DateTime.Now;
-
-                while (!sent && (DateTime.Now - startTime).TotalSeconds < 60)
+                await foreach (var message in _messageQueue.Reader.ReadAllAsync(ct)) // Process messages from the queue
                 {
-                    sent = await SendPayload(message);
+                    bool sent = false;
+                    DateTime startTime = DateTime.Now;
 
-                    if (sent)
+                    try
                     {
-                        break;
+                        while (!sent && (DateTime.Now - startTime).TotalSeconds < 60) // Retry for up to 1 minute
+                        {
+                            await Connect(); // Ensure connection is established before sending
+                            sent = await SendPayload(message);
+                            if (sent)
+                            {
+                                break;
+                            }
+                            await Task.Delay(2500, ct);
+                        }
+
+                        await MainThread.InvokeOnMainThreadAsync(() => // This is the line i don't like
+                        {
+                            message.Status = sent ? "\uf00c" : "\uf00d";
+                        });
+
+                        await _database.UpdateMessageAsync(message); // And this one
+                        await Task.Delay(250, ct);
                     }
-                    await Task.Delay(2500, ct);
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error sending message: {ex.Message}");
+                    }
                 }
-
-                await MainThread.InvokeOnMainThreadAsync(() =>
-                {
-                    message.Status = sent ? "\uf00c" : "\uf00d";
-                });
-
-                await _database.UpdateMessageAsync(message);
-                await Task.Delay(250, ct);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ProcessQueueAsync: {ex.Message}");
             }
         }
     }
