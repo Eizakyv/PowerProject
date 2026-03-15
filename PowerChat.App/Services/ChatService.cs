@@ -24,6 +24,7 @@ namespace PowerChat.App.Services
 
             _hubConnection.On<ChatMessage>("ReceiveMessage", async (message) =>
             {
+                message.Status = "\uf00c";
                 bool inserted = await _database.SaveMessageAsync(message);
                 if (!inserted)
                 {

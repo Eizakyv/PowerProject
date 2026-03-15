@@ -1,40 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
 	<PropertyGroup>
 		<TargetFrameworks>net10.0-android;net10.0-windows10.0.19041.0</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>PowerChat.App</RootNamespace>
 		<AssemblyName>PowerChat</AssemblyName>
 
-		<!-- Enable MAUI -->
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
-
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
-		<!-- App metadata -->
 		<ApplicationTitle>PowerChat</ApplicationTitle>
 		<ApplicationId>com.meyzov.powerchat.app</ApplicationId>
 		<ApplicationDisplayVersion>1.0.1</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<!-- Faster XAML -->
 		<MauiXamlInflator>SourceGen</MauiXamlInflator>
-
 		<WindowsPackageType>None</WindowsPackageType>
 
-		<!-- Platform minimum versions -->
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 
 		<PublishTrimmed>false</PublishTrimmed>
-
 		<PublishAot>false</PublishAot>
-
-		<SignAssembly>false</SignAssembly>
+		<AllowUnsafeBlocks>false</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -45,64 +36,31 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net10.0-android'">
 		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
 		<EnableLLVM>false</EnableLLVM>
-		<RunAOTCompilation>false</RunAOTCompilation>
-		<AndroidEnableMultiDex>false</AndroidEnableMultiDex>
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
+		<AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<Optimize>False</Optimize>
+		<Optimize>false</Optimize>
 		<RunAOTCompilation>false</RunAOTCompilation>
 	</PropertyGroup>
 
-
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net10.0-android'">
-
-		<!-- Google Play requires AAB -->
-		<AndroidPackageFormat>aab</AndroidPackageFormat>
-
-		<!-- Performance -->
-		<EnableLLVM>true</EnableLLVM>
-
-		<AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
-
-		<AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
-
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
 		<AndroidLinkMode>None</AndroidLinkMode>
-
-	</PropertyGroup>
-
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-android|AnyCPU'">
-	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	</PropertyGroup>
-
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-android|AnyCPU'">
-	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	  <AndroidPackageFormat>apk</AndroidPackageFormat>
+		<EnableLLVM>false</EnableLLVM>
+		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+		<AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+		<AndroidUseAapt2>true</AndroidUseAapt2>
 	</PropertyGroup>
 
 	<ItemGroup>
-
-		<!-- App icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.png" Color="#FFF8DC" />
-
-		<!-- Splash screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.png" Color="#FFF8DC" />
-
-		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
-
-		<!-- Fonts -->
 		<MauiFont Include="Resources\Fonts\*.ttf" />
 		<MauiFont Include="Resources\Fonts\*.otf" />
-
-		<!-- Raw assets -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<MauiFont Include="Resources\Fonts\fa-solid-900.otf" Alias="FASolid" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -113,6 +71,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Resources\Images\" />
+		<Folder Include="Resources\Images\" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiFont Update="Resources\Fonts\fa-solid-900.otf" Alias="FASolid" />
+	</ItemGroup>
+
 </Project>
