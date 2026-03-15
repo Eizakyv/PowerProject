@@ -82,20 +82,16 @@
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
 
-
 	<ItemGroup>
 
 		<!-- App icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#FFF8DC" BaseSize="1024,1024" />
+		<MauiIcon Include="Resources\AppIcon\appicon.png" Color="#FFF8DC" />
 
 		<!-- Splash screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFF8DC" BaseSize="1024,1024" />
+		<MauiSplashScreen Include="Resources\Splash\splash.png" Color="#FFF8DC" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
-
-		<!-- Example resized image -->
-		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
 
 		<!-- Fonts -->
 		<MauiFont Include="Resources\Fonts\*.ttf" />
@@ -103,7 +99,6 @@
 
 		<!-- Raw assets -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-
 	</ItemGroup>
 
 	<ItemGroup>
@@ -111,13 +106,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.4" />
-
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
-
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Resources\Images\" />
+	</ItemGroup>
 </Project>
